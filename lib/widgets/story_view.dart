@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -440,7 +439,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   StoryItem? get _currentStory {
     return widget.storyItems.firstWhereOrNull((it) => !it!.shown);
-
   }
 
   Widget get _currentView {
@@ -448,10 +446,11 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     item ??= widget.storyItems.last;
     return item?.view ?? Container();
   }
-  int get _currentIndex{
-    var index = widget.storyItems.indexOf(widget.storyItems.firstWhereOrNull((it) => !it!.shown));
+
+  int get _currentIndex {
+    return widget.storyItems
+        .indexOf(widget.storyItems.firstWhereOrNull((it) => !it!.shown));
   }
-  
 
   @override
   void initState() {
@@ -724,10 +723,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           Align(
             alignment: Alignment.bottomCenter,
             heightFactor: 1,
-            child: bottomWidgetBuilder(_currentIndex, context)
-                
+            child: widget.bottomWidgetBuilder != null
+                ? widget.bottomWidgetBuilder!(_currentIndex, context)
+                : Container(),
           ),
-          
         ],
       ),
     );
