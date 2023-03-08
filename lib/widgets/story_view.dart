@@ -408,9 +408,12 @@ class StoryView extends StatefulWidget {
   // Indicator Color
   final Color indicatorColor;
 
+  final Widget Function(int index, BuildContext context)? bottomWidgetBuilder;
+
   StoryView({
     required this.storyItems,
     required this.controller,
+    this.bottomWidgetBuilder,
     this.onComplete,
     this.onStoryShow,
     this.progressPosition = ProgressPosition.top,
@@ -437,6 +440,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   StoryItem? get _currentStory {
     return widget.storyItems.firstWhereOrNull((it) => !it!.shown);
+
   }
 
   Widget get _currentView {
@@ -444,6 +448,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     item ??= widget.storyItems.last;
     return item?.view ?? Container();
   }
+  int get _currentIndex{
+    var index = widget.storyItems.indexOf(widget.storyItems.firstWhereOrNull((it) => !it!.shown));
+  }
+  
 
   @override
   void initState() {
@@ -651,68 +659,75 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               ),
             ),
           ),
-          // Align(
-          //     alignment: Alignment.centerRight,
-          //     heightFactor: 1,
-          //     child: GestureDetector(
-          //       onTapDown: (details) {
-          //         widget.controller.pause();
-          //       },
-          //       onTapCancel: () {
-          //         widget.controller.play();
-          //       },
-          //       onTapUp: (details) {
-          //         // if debounce timed out (not active) then continue anim
-          //         if (_nextDebouncer?.isActive == false) {
-          //           widget.controller.play();
-          //         } else {
-          //           widget.controller.next();
-          //         }
-          //       },
-          //       onVerticalDragStart: widget.onVerticalSwipeComplete == null
-          //           ? null
-          //           : (details) {
-          //               widget.controller.pause();
-          //             },
-          //       onVerticalDragCancel: widget.onVerticalSwipeComplete == null
-          //           ? null
-          //           : () {
-          //               widget.controller.play();
-          //             },
-          //       onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
-          //           ? null
-          //           : (details) {
-          //               if (verticalDragInfo == null) {
-          //                 verticalDragInfo = VerticalDragInfo();
-          //               }
+          Align(
+              alignment: Alignment.centerRight,
+              heightFactor: 1,
+              child: GestureDetector(
+                onTapDown: (details) {
+                  widget.controller.pause();
+                },
+                onTapCancel: () {
+                  widget.controller.play();
+                },
+                onTapUp: (details) {
+                  // if debounce timed out (not active) then continue anim
+                  if (_nextDebouncer?.isActive == false) {
+                    widget.controller.play();
+                  } else {
+                    widget.controller.next();
+                  }
+                },
+                onVerticalDragStart: widget.onVerticalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        widget.controller.pause();
+                      },
+                onVerticalDragCancel: widget.onVerticalSwipeComplete == null
+                    ? null
+                    : () {
+                        widget.controller.play();
+                      },
+                onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        if (verticalDragInfo == null) {
+                          verticalDragInfo = VerticalDragInfo();
+                        }
 
-          //               verticalDragInfo!.update(details.primaryDelta!);
+                        verticalDragInfo!.update(details.primaryDelta!);
 
-          //               // TODO: provide callback interface for animation purposes
-          //             },
-          //       onVerticalDragEnd: widget.onVerticalSwipeComplete == null
-          //           ? null
-          //           : (details) {
-          //               widget.controller.play();
-          //               // finish up drag cycle
-          //               if (!verticalDragInfo!.cancel &&
-          //                   widget.onVerticalSwipeComplete != null) {
-          //                 widget.onVerticalSwipeComplete!(
-          //                     verticalDragInfo!.direction);
-          //               }
+                        // TODO: provide callback interface for animation purposes
+                      },
+                onVerticalDragEnd: widget.onVerticalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        widget.controller.play();
+                        // finish up drag cycle
+                        if (!verticalDragInfo!.cancel &&
+                            widget.onVerticalSwipeComplete != null) {
+                          widget.onVerticalSwipeComplete!(
+                              verticalDragInfo!.direction);
+                        }
 
-          //               verticalDragInfo = null;
-          //             },
-          //     )),
-          // Align(
-          //   alignment: Alignment.centerLeft,
-          //   heightFactor: 1,
-          //   child: SizedBox(
-          //       child: GestureDetector(onTap: () {
-          //         widget.controller.previous();
-          //       }),
-          //       width: 70),
-          // ),
+                        verticalDragInfo = null;
+                      },
+              )),
+          Align(
+            alignment: Alignment.centerLeft,
+            heightFactor: 1,
+            child: SizedBox(
+                child: GestureDetector(onTap: () {
+                  widget.controller.previous();
+                }),
+                width: 70),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            heightFactor: 1,
+            child: bottomWidgetBuilder(_currentIndex, context)
+                
+          ),
+          
         ],
       ),
     );
