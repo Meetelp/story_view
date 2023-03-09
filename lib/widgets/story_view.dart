@@ -720,9 +720,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 }),
                 width: 70),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            heightFactor: 1,
+          Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
             child: widget.bottomWidgetBuilder != null
                 ? widget.bottomWidgetBuilder!(_currentIndex, context)
                 : Container(),
